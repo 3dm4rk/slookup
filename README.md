@@ -6,7 +6,7 @@ Employee Schedule Lookup System
 A modern, responsive web application that retrieves employee schedule data from Google Sheets and displays it with automatic timezone conversion.
 
 🌐 Live Demo
-
+https://3dm4rk.github.io/slookup/
 
 📋 Features
 🔍 Employee Search: Look up employees by 5-digit HR ID
