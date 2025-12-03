@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Schedule Lookup</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f94144;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            flex: 1;
+            width: 100%;
+        }
+        
+        /* Header Styles */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.3;
+            animation: float 20s linear infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .timezone-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 16px;
+            border-radius: 50px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Search Section */
+        .search-section {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 40px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .search-section:hover {
+            transform: translateY(-5px);
+        }
+        
+        .search-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .input-group {
+            width: 100%;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: var(--dark);
+            text-align: left;
+            font-size: 1.1rem;
+        }
+        
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 20px;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 18px 20px 18px 60px;
+            font-size: 1.2rem;
+            border: 2px solid var(--light-gray);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: var(--light);
+        }
+        
+        input[type="text"]:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+            background: white;
+        }
+        
+        /* Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.2);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.3);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #651a9e 100%);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* Results Section */
+        .result-section {
+            display: none;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 40px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .employee-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 25px;
+            border-bottom: 2px solid var(--light-gray);
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .employee-info {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .employee-info h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .employee-details {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .employee-id {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .employee-name {
+            font-size: 2.2rem;
+            color: var(--dark);
+            font-weight: 700;
+            margin: 5px 0;
+        }
+        
+        /* Schedule Table */
+        .schedule-container {
+            overflow-x: auto;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+        }
+        
+        .schedule-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 800px;
+        }
+        
+        .schedule-table th {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            position: sticky;
+            top: 0;
+        }
+        
+        .schedule-table th:first-child {
+            border-radius: 15px 0 0 0;
+        }
+        
+        .schedule-table th:last-child {
+            border-radius: 0 15px 0 0;
+        }
+        
+        .schedule-table td {
+            padding: 18px 15px;
+            text-align: center;
+            border-bottom: 1px solid var(--light-gray);
+            font-size: 1rem;
+        }
+        
+        .schedule-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .schedule-table tr:nth-child(even) {
+            background-color: #f8f9ff;
+        }
+        
+        .schedule-table tr:hover {
+            background-color: #f0f3ff;
+        }
+        
+        .schedule-table .time-cell {
+            font-weight: 600;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 2px;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .time-off {
+            background-color: #ffeaea;
+            color: var(--danger);
+        }
+        
+        .time-on {
+            background-color: #e8f7ef;
+            color: #2a9d8f;
+        }
+        
+        .time-range {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .time-converted {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .timezone-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            background: rgba(67, 97, 238, 0.1);
+            border-radius: 4px;
+            color: var(--primary);
+        }
+        
+        /* Loading & Error States */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 50px;
+            font-size: 1.3rem;
+            color: var(--primary);
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+        }
+        
+        .loading i {
+            margin-right: 15px;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            display: none;
+            background: linear-gradient(135deg, #ffeaea 0%, #ffd6d6 100%);
+            color: var(--danger);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+            border-left: 5px solid var(--danger);
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        /* Main Footer */
+        .main-footer {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--gray);
+            font-size: 0.95rem;
+            padding: 25px 20px;
+            border-top: 1px solid var(--light-gray);
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 15px 0 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .footer-links a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+        
+        /* Copyright Footer */
+        .copyright-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--dark) 0%, #343a40 100%);
+            color: white;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .copyright-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .copyright-text {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .copyright-year {
+            color: var(--success);
+            font-weight: 600;
+        }
+        
+        .creator-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 50px;
+            margin-top: 5px;
+        }
+        
+        .creator-name {
+            color: var(--success);
+            font-weight: 600;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            h1 {
+                font-size: 2.4rem;
+            }
+            
+            .employee-header {
+                flex-direction: column;
+            }
+            
+            .schedule-table th,
+            .schedule-table td {
+                padding: 15px 10px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            
+            header {
+                padding: 25px 15px;
+                margin-bottom: 30px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .search-section,
+            .result-section {
+                padding: 25px 20px;
+            }
+            
+            .employee-name {
+                font-size: 1.8rem;
+            }
+            
+            .btn-primary {
+                padding: 16px 30px;
+                font-size: 1.1rem;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .schedule-container {
+                border-radius: 10px;
+            }
+            
+            .copyright-footer {
+                padding: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            header {
+                padding: 20px 15px;
+            }
+            
+            .employee-info h2 {
+                font-size: 1.5rem;
+            }
+            
+            .employee-name {
+                font-size: 1.6rem;
+            }
+            
+            .timezone-badge {
+                flex-direction: column;
+                padding: 10px;
+            }
+            
+            .schedule-table th,
+            .schedule-table td {
+                padding: 12px 8px;
+                font-size: 0.9rem;
+            }
+            
+            .time-range {
+                font-size: 1rem;
+            }
+            
+            .time-converted {
+                font-size: 0.75rem;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .copyright-text {
+                font-size: 0.9rem;
+            }
+            
+            .creator-badge {
+                flex-direction: column;
+                padding: 10px;
+            }
+        }
+        
+        /* Animation for success */
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .success-pulse {
+            animation: successPulse 0.5s ease;
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+        
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            z-index: 100;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1><i class="fas fa-calendar-alt"></i> Employee Schedule Lookup</h1>
+                <p class="subtitle">Enter a 5-digit HR ID to view employee schedule for December</p>
+                <div class="timezone-badge">
+                    <span><i class="fas fa-globe-americas"></i> Houston (CST) → Manila (PHT)</span>
+                    <span class="tooltip" data-tooltip="Times automatically converted from Central Time to Philippine Time">
+                        <i class="fas fa-info-circle"></i>
+                    </span>
+                </div>
+            </div>
+        </header>
+        
+        <section class="search-section">
+            <div class="search-form">
+                <div class="input-group">
+                    <label class="input-label" for="hrid">
+                        <i class="fas fa-user-tag"></i> HR ID (5-digit number)
+                    </label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-id-card input-icon"></i>
+                        <input type="text" id="hrid" placeholder="e.g., 12345" maxlength="5" autocomplete="off">
+                    </div>
+                </div>
+                <button type="button" id="searchBtn" class="btn-primary">
+                    <i class="fas fa-search"></i> Search Employee Schedule
+                </button>
+            </div>
+        </section>
+        
+        <div class="loading" id="loading">
+            <i class="fas fa-spinner"></i> Loading employee data from Google Sheets...
+        </div>
+        
+        <div class="error" id="error"></div>
+        
+        <section class="result-section" id="resultSection">
+            <div class="employee-header">
+                <div class="employee-info">
+                    <h2><i class="fas fa-user-clock"></i> Employee Schedule - December</h2>
+                    <div class="employee-details">
+                        <div class="employee-id">
+                            <i class="fas fa-fingerprint"></i> HR ID: <span id="resultHrid"></span>
+                        </div>
+                        <div class="employee-name" id="resultName"></div>
+                        <div class="timezone-badge">
+                            <i class="fas fa-clock"></i> All times shown in Manila Time (PHT)
+                            <span class="tooltip" data-tooltip="Original Houston times converted with +14 hour offset">
+                                <i class="fas fa-info-circle"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" id="newSearchBtn" class="btn-secondary">
+                    <i class="fas fa-redo"></i> New Search
+                </button>
+            </div>
+            
+            <div class="schedule-container">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Day/Period</th>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                            <th>Saturday</th>
+                            <th>Sunday</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleBody">
+                        <!-- Schedule data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <footer class="main-footer">
+            <p>Employee Schedule Lookup System | Data sourced from Google Sheets API</p>
+            <p>December Schedule | Houston CST to Manila PHT Conversion | Sheet: Month of December</p>
+            <div class="footer-links">
+                <a href="#" id="refreshData"><i class="fas fa-sync-alt"></i> Refresh Data</a>
+                <a href="#" id="viewSource"><i class="fas fa-code"></i> View Source</a>
+                <a href="#" id="reportIssue"><i class="fas fa-bug"></i> Report Issue</a>
+            </div>
+        </footer>
+        
+        <!-- New Copyright Footer -->
+        <footer class="copyright-footer">
+            <div class="copyright-content">
+                <div class="copyright-text">
+                    © <span class="copyright-year">2025</span> All Rights Reserved
+                </div>
+                <div class="creator-badge">
+                    <i class="fas fa-code"></i>
+                    <span>Created by <span class="creator-name">Edmark</span></span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const searchBtn = document.getElementById('searchBtn');
+            const newSearchBtn = document.getElementById('newSearchBtn');
+            const hridInput = document.getElementById('hrid');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const resultSection = document.getElementById('resultSection');
+            const resultHrid = document.getElementById('resultHrid');
+            const resultName = document.getElementById('resultName');
+            const scheduleBody = document.getElementById('scheduleBody');
+            const refreshDataBtn = document.getElementById('refreshData');
+            
+            // Google Sheets API configuration
+            const SPREADSHEET_ID = '1hkUvzGC7sypnX8gI7Knv_mNJULZrDfbEJ0m8Z74CwEY';
+            const SHEET_NAME = 'Month of December';
+            const API_KEY = 'AIzaSyBkehHIU6AHhAZ3ESbC9-PzgYh8GeGLPI0';
+            const RANGE = 'A3:I91';
+            
+            // Timezone conversion: Houston CST to Manila PHT (+14 hours)
+            const TIMEZONE_OFFSET = 14; // hours
+            
+            // Focus on the input field when page loads
+            hridInput.focus();
+            
+            // Function to convert time from Houston CST to Manila PHT
+            function convertToManilaTime(timeStr) {
+                if (!timeStr || timeStr.trim() === '' || 
+                    timeStr.toLowerCase().includes('off') || 
+                    timeStr.toLowerCase().includes('holiday') ||
+                    timeStr.toLowerCase().includes('na')) {
+                    return { original: timeStr, converted: timeStr, isConverted: false };
+                }
+                
+                try {
+                    // Parse time ranges like "9:00-17:00" or "9:00 AM - 5:00 PM"
+                    let cleanedTime = timeStr.trim();
+                    
+                    // Handle different time formats
+                    if (cleanedTime.includes('-')) {
+                        const [startStr, endStr] = cleanedTime.split('-').map(s => s.trim());
+                        
+                        // Convert 12-hour format to 24-hour if needed
+                        const convertTo24Hour = (time) => {
+                            let timeUpper = time.toUpperCase();
+                            let hour, minute = 0;
+                            
+                            // Check for AM/PM
+                            if (timeUpper.includes('AM') || timeUpper.includes('PM')) {
+                                const match = timeUpper.match(/(\d{1,2}):?(\d{2})?\s*(AM|PM)/);
+                                if (match) {
+                                    hour = parseInt(match[1]);
+                                    minute = match[2] ? parseInt(match[2]) : 0;
+                                    const period = match[3];
+                                    
+                                    if (period === 'PM' && hour !== 12) hour += 12;
+                                    if (period === 'AM' && hour === 12) hour = 0;
+                                }
+                            } else {
+                                // Assume 24-hour format
+                                const parts = time.split(':');
+                                hour = parseInt(parts[0]);
+                                minute = parts[1] ? parseInt(parts[1]) : 0;
+                            }
+                            
+                            return { hour, minute };
+                        };
+                        
+                        const startTime = convertTo24Hour(startStr);
+                        const endTime = convertTo24Hour(endStr);
+                        
+                        // Add timezone offset
+                        let startHour = startTime.hour + TIMEZONE_OFFSET;
+                        let endHour = endTime.hour + TIMEZONE_OFFSET;
+                        
+                        // Handle day wrap-around
+                        if (startHour >= 24) startHour -= 24;
+                        if (endHour >= 24) endHour -= 24;
+                        
+                        // Format back to readable time
+                        const formatTime = (hour, minute) => {
+                            let period = 'AM';
+                            let displayHour = hour;
+                            
+                            if (hour >= 12) {
+                                period = 'PM';
+                                if (hour > 12) displayHour = hour - 12;
+                            }
+                            if (hour === 0) displayHour = 12;
+                            
+                            return `${displayHour}:${minute.toString().padStart(2, '0')} ${period}`;
+                        };
+                        
+                        const convertedStart = formatTime(startHour, startTime.minute);
+                        const convertedEnd = formatTime(endHour, endTime.minute);
+                        
+                        return {
+                            original: `${startStr} - ${endStr}`,
+                            converted: `${convertedStart} - ${convertedEnd}`,
+                            isConverted: true
+                        };
+                    }
+                    
+                    return { original: timeStr, converted: timeStr, isConverted: false };
+                    
+                } catch (err) {
+                    console.error('Time conversion error:', err);
+                    return { original: timeStr, converted: timeStr, isConverted: false };
+                }
+            }
+            
+            // Function to fetch data from Google Sheets
+            async function fetchEmployeeData(hrid) {
+                // Hide any previous error and result
+                error.style.display = 'none';
+                resultSection.style.display = 'none';
+                loading.style.display = 'block';
+                
+                try {
+                    // Build the API URL
+                    const apiUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}!${RANGE}?key=${API_KEY}`;
+                    
+                    console.log('Fetching data from:', apiUrl);
+                    
+                    const response = await fetch(apiUrl);
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`API Error: ${errorData.error.message}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (!data.values || data.values.length === 0) {
+                        throw new Error('No data found in the spreadsheet');
+                    }
+                    
+                    console.log('Data received, rows:', data.values.length);
+                    
+                    // Find employee by HR ID
+                    const employee = findEmployeeByHRID(data.values, hrid);
+                    
+                    if (employee) {
+                        displayEmployeeData(employee);
+                    } else {
+                        throw new Error(`No employee found with HR ID: ${hrid}`);
+                    }
+                    
+                } catch (err) {
+                    console.error('Error fetching employee data:', err);
+                    error.innerHTML = `
+                        <strong><i class="fas fa-exclamation-triangle"></i> Error:</strong> ${err.message}
+                        <br><br>
+                        <small>Please check the HR ID and try again. If the problem persists, contact support.</small>
+                    `;
+                    error.style.display = 'block';
+                } finally {
+                    loading.style.display = 'none';
+                }
+            }
+            
+            // Function to find employee by HR ID
+            function findEmployeeByHRID(rows, hrid) {
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    
+                    if (row && row.length > 0) {
+                        const rowHrid = row[0] ? row[0].toString().trim() : '';
+                        
+                        if (rowHrid === hrid) {
+                            return {
+                                hrid: hrid,
+                                name: row[1] ? row[1].trim() : 'Name not specified',
+                                schedule: {
+                                    monday: row[2] || 'OFF',
+                                    tuesday: row[3] || 'OFF',
+                                    wednesday: row[4] || 'OFF',
+                                    thursday: row[5] || 'OFF',
+                                    friday: row[6] || 'OFF',
+                                    saturday: row[7] || 'OFF',
+                                    sunday: row[8] || 'OFF'
+                                }
+                            };
+                        }
+                    }
+                }
+                return null;
+            }
+            
+            // Function to display employee data
+            function displayEmployeeData(data) {
+                resultHrid.textContent = data.hrid;
+                resultName.textContent = data.name;
+                
+                // Clear previous schedule data
+                scheduleBody.innerHTML = '';
+                
+                // Create schedule rows
+                const scheduleRows = [
+                    { 
+                        label: 'Shift Schedule', 
+                        days: [
+                            { day: 'monday', value: data.schedule.monday },
+                            { day: 'tuesday', value: data.schedule.tuesday },
+                            { day: 'wednesday', value: data.schedule.wednesday },
+                            { day: 'thursday', value: data.schedule.thursday },
+                            { day: 'friday', value: data.schedule.friday },
+                            { day: 'saturday', value: data.schedule.saturday },
+                            { day: 'sunday', value: data.schedule.sunday }
+                        ]
+                    }
+                ];
+                
+                // Add schedule rows to table
+                scheduleRows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    
+                    // Add day label
+                    const labelTd = document.createElement('td');
+                    labelTd.innerHTML = `<strong>${row.label}</strong>`;
+                    labelTd.style.fontWeight = '600';
+                    labelTd.style.backgroundColor = '#f8f9ff';
+                    tr.appendChild(labelTd);
+                    
+                    // Add schedule for each day
+                    row.days.forEach(dayData => {
+                        const td = document.createElement('td');
+                        const timeValue = dayData.value;
+                        const timeConverted = convertToManilaTime(timeValue);
+                        
+                        // Create time cell
+                        const timeCell = document.createElement('div');
+                        timeCell.className = 'time-cell';
+                        
+                        if (!timeConverted.isConverted || 
+                            timeValue.toLowerCase().includes('off') ||
+                            timeValue.trim() === '') {
+                            timeCell.classList.add('time-off');
+                            timeCell.innerHTML = `
+                                <div class="time-range">${timeValue || 'OFF'}</div>
+                            `;
+                        } else {
+                            timeCell.classList.add('time-on');
+                            timeCell.innerHTML = `
+                                <div class="time-range">${timeConverted.converted}</div>
+                                <div class="time-converted">
+                                    <span class="timezone-indicator">
+                                        <i class="fas fa-exchange-alt"></i> CST: ${timeConverted.original}
+                                    </span>
+                                </div>
+                            `;
+                        }
+                        
+                        td.appendChild(timeCell);
+                        tr.appendChild(td);
+                    });
+                    
+                    scheduleBody.appendChild(tr);
+                });
+                
+                // Show result section with animation
+                resultSection.style.display = 'block';
+                resultSection.classList.add('success-pulse');
+                
+                // Remove animation class after animation completes
+                setTimeout(() => {
+                    resultSection.classList.remove('success-pulse');
+                }, 500);
+                
+                // Scroll to results
+                resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            
+            // Function to validate HR ID input
+            function validateHrid(hrid) {
+                if (!hrid) {
+                    return 'Please enter an HR ID';
+                }
+                
+                if (!/^\d{5}$/.test(hrid)) {
+                    return 'HR ID must be exactly 5 digits';
+                }
+                
+                return null;
+            }
+            
+            // Event Listeners
+            searchBtn.addEventListener('click', function() {
+                const hrid = hridInput.value.trim();
+                const validationError = validateHrid(hrid);
+                
+                if (validationError) {
+                    error.innerHTML = `<strong><i class="fas fa-exclamation-circle"></i> Validation Error:</strong> ${validationError}`;
+                    error.style.display = 'block';
+                    resultSection.style.display = 'none';
+                    hridInput.focus();
+                    return;
+                }
+                
+                fetchEmployeeData(hrid);
+            });
+            
+            hridInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchBtn.click();
+                }
+            });
+            
+            newSearchBtn.addEventListener('click', function() {
+                resultSection.style.display = 'none';
+                hridInput.value = '';
+                hridInput.focus();
+                error.style.display = 'none';
+            });
+            
+            refreshDataBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const hrid = hridInput.value.trim();
+                if (hrid && /^\d{5}$/.test(hrid)) {
+                    fetchEmployeeData(hrid);
+                } else {
+                    error.innerHTML = `<strong><i class="fas fa-info-circle"></i> Info:</strong> Please enter an HR ID first`;
+                    error.style.display = 'block';
+                }
+            });
+            
+            // Format input to only allow numbers
+            hridInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                
+                // Hide error when user starts typing
+                if (this.value.length > 0) {
+                    error.style.display = 'none';
+                }
+            });
+            
+            // Add visual feedback for input
+            hridInput.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            hridInput.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+            
+            // Initialize tooltips
+            document.querySelectorAll('.tooltip').forEach(el => {
+                el.addEventListener('mouseenter', function() {
+                    this.style.opacity = '0.9';
+                });
+                el.addEventListener('mouseleave', function() {
+                    this.style.opacity = '1';
+                });
+            });
+            
+            // Log initialization
+            console.log('Employee Schedule Lookup System Loaded');
+            console.log('Timezone Conversion: Houston CST → Manila PHT (+14 hours)');
+            console.log('Created by Edmark - © 2025 All Rights Reserved');
+        });
+    </script>
+</body>
+</html>
